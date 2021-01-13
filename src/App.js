@@ -6,8 +6,11 @@ import { withStyles } from '@material-ui/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import PropTypes from 'prop-types';
-import TextField from '@material-ui/core/TextField';
-import FormControl from '@material-ui/core/FormControl';
+import AppBar from '@material-ui/core/AppBar';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import Typography from '@material-ui/core/Typography';
+import Box from '@material-ui/core/Box';
     
 const styles = theme => ({
   root: {
@@ -20,27 +23,42 @@ const styles = theme => ({
   },
 });
 
+function a11yProps (index) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
+
+function TabPanel (props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box p={3}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedMenu: "your_clients",
-      authTokenUrl: "",
+      value: "",
+      setValue: ""
     };
   }
-
-  renderSignUpForm = () => {
-    const {classes} = this.props;
-    return (
-      "asldasd"
-    //   <FormControl>
-    //       <InputLabel htmlFor="my-input">Email address</InputLabel>
-    //       <Input id="my-input" aria-describedby="my-helper-text" />
-    //       <FormHelperText id="my-helper-text">We'll never share your email.</FormHelperText>
-    // </FormControl>
-    )
-  }
- 
+  
 
   renderModal = () => {
     const {classes} = this.props;
@@ -48,7 +66,7 @@ class App extends React.Component {
       <div className={classes.root}>
       <Grid container spacing={3}>
         <Grid item xs={8}>
-          {this.renderSignUpForm()}
+          <Paper className={classes.paper}>xs=12</Paper>
         </Grid>
         <Grid item xs={4}>
           <Paper className={classes.paper}>xs=6</Paper>
@@ -58,11 +76,38 @@ class App extends React.Component {
     )
   }
 
+  handleChange = (event, newValue) => {
+    console.log(newValue, "11111111111111");
+    this.setState(
+      {
+        value: newValue
+      }
+    );
+  };
+
+  // TabPanel.propTypes = {
+  //   children: PropTypes.node,
+  //   index: PropTypes.any.isRequired,
+  //   value: PropTypes.any.isRequired,
+  // };
+
   render() {
+    const {classes} = this.props;
     return (
-      <div> 
-        {this.renderModal()}
-      </div>
+      <div className={classes.root}>
+      <AppBar position="static">
+        <Tabs value="Sign Up" onChange={(event) => this.handleChange()} aria-label="simple tabs example">
+          <Tab label="Item One" {...a11yProps(0)} />
+          <Tab label="Login" {...a11yProps(1)} />
+        </Tabs>
+      </AppBar>
+      <TabPanel value="Sign Up" index={0}>
+        Item One
+      </TabPanel>
+      <TabPanel value= "Login"index={1}>
+        Item Two
+      </TabPanel>
+    </div>
     )
   }
 }
