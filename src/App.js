@@ -297,7 +297,6 @@ class App extends React.Component {
   validate = (response) => {
     if (response.status == 200)  {
       sessionStorage.setItem("authToken", response.data.authToken);
-      console.log(response.data, "1111111111")
       this.setState({shouldRedirect: true, redirectPath: "/dashboard/"})
     }
   }

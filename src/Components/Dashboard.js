@@ -12,6 +12,8 @@ import Row from 'react-bootstrap/Row'
 import Container from 'react-bootstrap/Container'
 import Grid from '@material-ui/core/Grid';
 import '../App.css';
+import PaperCard from "./PaperCard";
+import { CompareArrowsOutlined } from "@material-ui/icons";
 
 const styles = theme => ({
     root: {
@@ -53,6 +55,15 @@ class Dashboard extends React.Component {
             company: ""
           },
           subscriptions: [],
+          card: {
+              type: "",
+              cardNumber: "",
+              expiryMonth: 0,
+              expiryYear: 0,
+              cvv: ""
+          },
+          hasCard: false,
+          hasSubscriptions: false
         };
       }
 
@@ -70,6 +81,20 @@ class Dashboard extends React.Component {
             }
 
             this.setState({userDetails: userObject});
+        }
+    }
+    
+    updateCardDetails = (resp) => {
+        if (resp.status == 200 && resp.data.cardNumber != "") {
+            let returned = resp.data;
+            let cardObject = {
+                type: returned.type,
+                cardNumber: returned.cardNumber, 
+                expiryMonth: parseInt(returned.expiryMonth), 
+                expiryYear: parseInt(returned.expiryYear),
+                cvv: returned.cvv
+            }
+            this.setState({card: cardObject, hasCard: true});
         }
     }
 
@@ -90,7 +115,7 @@ class Dashboard extends React.Component {
                     }
                     formatted.push(obj);
                 })
-                this.setState({subscriptions: formatted});
+                this.setState({subscriptions: formatted, hasSubscriptions: true});
             }
             
         }
@@ -99,7 +124,8 @@ class Dashboard extends React.Component {
     getCardDetails = (authToken, headers) => {
         let endpoint = this.state.baseUrl + "payment_method/get_card_details/" + this.state.userDetails.userId + "/"
         axios.get(endpoint, {headers: headers})
-        // .then WIP
+        .then((resp) => {this.updateCardDetails(resp)})
+        .catch((error) => console.log("ERROR -> ", error))
     }
 
     getSubscriptions = (authToken, headers) => {
@@ -142,6 +168,63 @@ class Dashboard extends React.Component {
         }
     }
 
+    handleCardNumberChange = (event) => {
+        let card = this.state.card;
+        card.cardNumber = event.target.value; 
+        this.setState({card: card});
+    }
+
+    handleMonthChange = (event) => {
+        let card = this.state.card;
+        card.expiryMonth = parseInt(event.target.value);
+        this.setState({card: card});
+    }
+
+    handleYearChange = (event) => {
+        let card = this.state.card;
+        card.expiryYear = parseInt(event.target.value); 
+        this.setState({card: card});
+    }
+
+    handleCVVChange = (event) => {
+        let card = this.state.card;
+        card.cvv = event.target.value; 
+        this.setState({card: card});
+    }
+
+    handleSave = (event) => {
+        event.preventDefault();
+        let endpoint = this.state.baseUrl + "payment_method/create/"
+        const headers = {
+            "Content-Type": "application/json",
+            "Authorization": "Token " + sessionStorage.getItem("authToken")
+        }
+        axios.post(endpoint, this.state.card, {headers: headers})
+        .then((resp) => console.log(resp)) // Call Update payment method API and addDefaultpaymentmethod
+        .catch((error) => console.log("ERROR -> ", error))
+    }
+
+    // Called if the user does not have any card saved
+    renderAddCardForm = () => {
+        return <PaperCard 
+            onCardNumberChange={this.handleCardNumberChange} 
+            onMonthChange={this.handleMonthChange}
+            onYearChange={this.handleYearChange}
+            onCVVChange={this.handleCVVChange}
+            onSave={this.handleSave}
+        />
+    }
+
+    renderCardSection = () => {
+        let hasCard = this.state.hasCard;
+        hasCard = false; // REMOVE THIS LINE ONCE DONE
+        if (! hasCard) {
+            return <div> {this.renderAddCardForm()} </div>
+        } else {
+            // # WIP
+        }
+    }
+
     render() {
         return (
             <div> 
@@ -157,7 +240,7 @@ class Dashboard extends React.Component {
                     <div className="split right">
                     <div className="centered">
                        <div> 
-                           {this.renderCardSe}
+                           {this.renderCardSection()}
                        </div>
                     </div>
                 </div>
