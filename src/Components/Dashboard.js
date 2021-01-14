@@ -28,7 +28,6 @@ class Dashboard extends React.Component {
 
 
     render() {
-        console.log("FFFFFFFFFFFFFFFFFFFFFFFf")
         return (
             <p> Dashboard </p>
         )

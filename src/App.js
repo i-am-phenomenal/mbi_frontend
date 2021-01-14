@@ -287,23 +287,17 @@ class App extends React.Component {
 
   componentDidMount() {
     let authToken = sessionStorage.getItem("authToken");
-    console.log(authToken, "1111111111111111111111");
     if (authToken) {
-      // location.href = "http://localhost:3000/dashboard/" ;
       this.setState({redirectPath: "/dashboard/", shouldRedirect: true})
-      //  
-      // history.push("/dashboard/")
-      // return <Redirect to="/dashboard/" />
     } else {
-      this.setState({redirectPath: "/"})
+      this.setState({redirectPath: "/", shouldRedirect: false})
     }
   }
 
   validate = (response) => {
     if (response.status == 200)  {
       sessionStorage.setItem("authToken", response.data.authToken);
-      console.log(sessionStorage.getItem("authToken"), "222222222222222222222");
-      // location.href = "http://localhost:3000/dashboard/";
+      this.setState({shouldRedirect: true, redirectPath: "/dashboard/"})
     }
   }
 
@@ -419,11 +413,13 @@ class App extends React.Component {
     return (
       <Router> 
         <Switch>
+          
             <Route path="/dashboard/" component={Dashboard} /> 
                 {/* <Dashboard /> */}
             {/* </Route> */}
-            <Route path = "/">
-                {this.renderHomePage()}
+            <Route exact path = "/">
+                {this.state.shouldRedirect ? <Redirect to="/dashboard/" /> : this.renderHomePage()}
+                
             </Route>
         </Switch>
       </Router>
@@ -432,11 +428,6 @@ class App extends React.Component {
 
   render() {
     const {classes} = this.props;
-    if (this.state.shouldRedirect) {
-      return <Redirect to="/dashboard/" />
-      // return <Redirect to={this.state.redirectPath} />;
-      // browserHistory.push('/dashboard/');
-    }
     return (
       <div> {this.renderRouterSwitch()} </div> 
     )
