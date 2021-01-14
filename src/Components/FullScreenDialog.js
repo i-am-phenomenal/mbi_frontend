@@ -62,19 +62,17 @@ class FullScreenDialog extends React.Component {
       customerId: metadata.customerId,
       priceId: priceId
     }
-    console.log(requestBody, "22222222222222222");
     const headers = {
       "Content-Type": "application/json",
       "Authorization": "Token " + sessionStorage.getItem("authToken")
   }
     axios.post(endpoint, requestBody, {headers: headers})
-    .then((resp) => console.log(resp, "RRRRRRRRRRRRRRRRRRRRRRR"))
     .catch((error) => console.log("ERROR ==> ", error))
   }
 
   handleOnPurchaseClick = (event, priceId) => {
     if (this.props.metadata.paymentMethodId == null) {
-      alert("You need to enter payment metod details first");
+      alert("You need to enter payment method details first");
     } else {
       {this.subscribeToProduct(priceId)}
     }
@@ -100,16 +98,6 @@ class FullScreenDialog extends React.Component {
         </AppBar>
         <List>
           {plans}
-          {/* <ListItem button>
-            <ListItemText primary="Phone ringtone" secondary="Titania" />
-            <ListItemText primary="Phone ringtone" secondary="Titania" />
-          </ListItem>
-          <Divider />
-          <ListItem button>
-            <ListItemText primary="Default notification ringtone" secondary="Tethys" />
-            <ListItemText primary="Phone ringtone" secondary="Titania" />
-            <ListItemText primary="Phone ringtone" secondary="Titania" />
-          </ListItem> */}
         </List>
       </Dialog>
     </div>
@@ -117,9 +105,4 @@ class FullScreenDialog extends React.Component {
   }
 }
 
-// FullScreenDialog.propTypes = {
-//   classes: PropTypes.object.isRequired,
-// };
-
 export default FullScreenDialog;
-// export default withStyles(styles)(FullScreenDialog);
