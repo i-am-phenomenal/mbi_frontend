@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import './App.css';
 import React from "react";
 import { makeStyles } from '@material-ui/core/styles';
@@ -20,6 +19,16 @@ import Icon from '@material-ui/core/Icon';
 import SaveIcon from '@material-ui/icons/Save';
 import Button from '@material-ui/core/Button';
 import axios from 'axios';
+// import {createBrowserHistory} from "history";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  Redirect 
+} from "react-router-dom";
+import { createBrowserHistory } from 'history'
+import Dashboard from './Components/Dashboard';
     
 const styles = theme => ({
   root: {
@@ -50,6 +59,8 @@ class App extends React.Component {
         company: ""
       },
       baseUrl: "http://localhost:8000/",
+      redirectPath: "",
+      shouldRedirect: false
     };
   }
   
@@ -113,6 +124,20 @@ class App extends React.Component {
     }
   }
 
+  resetUserState = () => {
+    let updatedUser = {
+      "firstName": "",
+      "lastName": "",
+      "emailId": "",
+      "password": "",
+      "address": "",
+      "dateOfBirth": "",
+      "company": ""
+    }
+
+    this.setState({userDetails: updatedUser});
+  }
+
   signUpUser = (event) => {
     event.preventDefault();
     const headers = {
@@ -120,7 +145,7 @@ class App extends React.Component {
     }
     let userDetails = this.state.userDetails; 
     axios.post(this.state.baseUrl + "manager/signup/", userDetails, {headers: headers})
-    .then((response) => console.log(response, '11111111111111'))
+    .then((response) => {this.resetUserState()})
     .catch((error) => console.log("ERROR -> ", error))
   }
 
@@ -260,8 +285,102 @@ class App extends React.Component {
     )
   }
 
+  componentDidMount() {
+    let authToken = sessionStorage.getItem("authToken");
+    console.log(authToken, "1111111111111111111111");
+    if (authToken) {
+      // location.href = "http://localhost:3000/dashboard/" ;
+      this.setState({redirectPath: "/dashboard/", shouldRedirect: true})
+      //  
+      // history.push("/dashboard/")
+      // return <Redirect to="/dashboard/" />
+    } else {
+      this.setState({redirectPath: "/"})
+    }
+  }
+
+  validate = (response) => {
+    if (response.status == 200)  {
+      sessionStorage.setItem("authToken", response.data.authToken);
+      console.log(sessionStorage.getItem("authToken"), "222222222222222222222");
+      // location.href = "http://localhost:3000/dashboard/";
+    }
+  }
+
+  login = (event) => {
+    event.preventDefault();
+    const headers = {
+      "Content-Type": "application/json"
+    }
+    let requestBody = {
+      "emailId": this.state.userDetails.emailId,
+      "password": this.state.userDetails.password
+    }
+    axios.post(this.state.baseUrl + "manager/login/", requestBody, {headers: headers})
+    .then((response) => {this.validate(response)})
+    .catch((error) => console.log("ERROR = ", error))
+  }
+
   renderLoginForm = () => {
-    return <p> lili</p>
+    const classes = this.props;
+    let user = this.state.userDetails;
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          flexWrap: "wrap",
+          width: "50%",
+          marginLeft: "25%",
+          padding: "-5%"
+        }}
+      >
+
+        <TextField
+            id="email_id"
+            label="Email Id"
+            onChange={(event)=> this.handleInputChange(event, "emailId")}
+            style={{ margin: 8 }}
+            value = {user.emailId}
+            placeholder="Enter your Email Id"
+            helperText=""
+            fullWidth
+            margin="normal"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            variant="outlined"
+          />    
+
+          <TextField
+            id="password"
+            label="Password"
+            onChange={(event)=> this.handleInputChange(event, "password")}
+            value={user.password}
+            style={{ margin: 8 }}
+            placeholder="Enter your Password"
+            helperText=""
+            fullWidth
+            type="password"
+            margin="normal"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            variant="outlined"
+          />    
+
+        <Button
+            style={{ margin: 8, marginLeft: "40%" }}
+            variant="contained"
+            onClick = {(event) => this.login(event)}
+            color="primary"
+            className={classes.button}
+          >
+           Login
+      </Button>
+
+      </div>
+    )
   }
 
   renderView = () => {
@@ -280,8 +399,7 @@ class App extends React.Component {
     }
   }
 
-  render() {
-    const {classes} = this.props;
+  renderHomePage = () => {
     return (
       <div>
           <Nav variant="tabs" >
@@ -294,6 +412,33 @@ class App extends React.Component {
           </Nav>
       {this.renderView()}
       </div>
+    )
+  }
+
+  renderRouterSwitch = () => {
+    return (
+      <Router> 
+        <Switch>
+            <Route path="/dashboard/" component={Dashboard} /> 
+                {/* <Dashboard /> */}
+            {/* </Route> */}
+            <Route path = "/">
+                {this.renderHomePage()}
+            </Route>
+        </Switch>
+      </Router>
+    )
+  }
+
+  render() {
+    const {classes} = this.props;
+    if (this.state.shouldRedirect) {
+      return <Redirect to="/dashboard/" />
+      // return <Redirect to={this.state.redirectPath} />;
+      // browserHistory.push('/dashboard/');
+    }
+    return (
+      <div> {this.renderRouterSwitch()} </div> 
     )
   }
 }
