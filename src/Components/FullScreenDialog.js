@@ -15,16 +15,8 @@ import CloseIcon from '@material-ui/icons/Close';
 import Slide from '@material-ui/core/Slide';
 import axios from 'axios';
 import PropTypes from 'prop-types';
-
-// const styles = theme => ({
-//   appBar: {
-//     position: 'relative',
-//   },
-//   title: {
-//     marginLeft: theme.spacing(2),
-//     flex: 1,
-//   },
-// });
+import PlanItem from "./PlanItem";
+import { CompareArrowsOutlined } from '@material-ui/icons';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -34,7 +26,7 @@ class FullScreenDialog extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      products: []
+      products: [],
     }
   }
 
@@ -61,13 +53,37 @@ class FullScreenDialog extends React.Component {
     .then((resp) => {this.setProducts(resp)})
     .catch((error) => console.log("ERROR ==> ", error))
   }
+  
+  subscribeToProduct = (priceId) => {
+    let metadata = this.props.metadata;
+    let endpoint = "http://localhost:8000/subscriptions/create/"
+    let requestBody = {
+      paymentMethodId: metadata.paymentMethodId,
+      customerId: metadata.customerId,
+      priceId: priceId
+    }
+    console.log(requestBody, "22222222222222222");
+    const headers = {
+      "Content-Type": "application/json",
+      "Authorization": "Token " + sessionStorage.getItem("authToken")
+  }
+    axios.post(endpoint, requestBody, {headers: headers})
+    .then((resp) => console.log(resp, "RRRRRRRRRRRRRRRRRRRRRRR"))
+    .catch((error) => console.log("ERROR ==> ", error))
+  }
+
+  handleOnPurchaseClick = (event, priceId) => {
+    if (this.props.metadata.paymentMethodId == null) {
+      alert("You need to enter payment metod details first");
+    } else {
+      {this.subscribeToProduct(priceId)}
+    }
+  }
 
   render() {
-    const {handleClose, open}= this.props;
+    const {handleClose, open, metadata}= this.props;
     const plans = this.state.products.map((product) => 
-      <ListItem button > 
-        
-      </ListItem>
+      <ListItem> <PlanItem product={product} onPurchase={this.handleOnPurchaseClick} /> </ListItem>
     ) 
     return (
       <div>
@@ -83,6 +99,7 @@ class FullScreenDialog extends React.Component {
           </Toolbar>
         </AppBar>
         <List>
+          {plans}
           {/* <ListItem button>
             <ListItemText primary="Phone ringtone" secondary="Titania" />
             <ListItemText primary="Phone ringtone" secondary="Titania" />

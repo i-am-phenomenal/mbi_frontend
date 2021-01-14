@@ -345,7 +345,15 @@ class Dashboard extends React.Component {
 
     renderSubscriptionPrompt = () => {
         if (this.state.subsPromptState) {
-            return <FullScreenDialog handleClose={this.closeDialog} open={true}/> 
+            return <FullScreenDialog 
+            handleClose={this.closeDialog} 
+            open={true} 
+            metadata={
+                {
+                    paymentMethodId: this.state.userDetails.paymentMethodId,
+                    customerId: this.state.userDetails.userId
+                }
+            } /> 
         }
     }
 
