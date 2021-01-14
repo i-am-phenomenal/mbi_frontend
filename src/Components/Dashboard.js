@@ -10,6 +10,8 @@ import OutlinedCard from "./Card";
 import Col from 'react-bootstrap/Col'
 import Row from 'react-bootstrap/Row'
 import Container from 'react-bootstrap/Container'
+import Grid from '@material-ui/core/Grid';
+import '../App.css';
 
 const styles = theme => ({
     root: {
@@ -29,6 +31,9 @@ const styles = theme => ({
       listStyle: {
         flexDirection: 'row',
         flexWrap: 'wrap'
+      },
+      gridClass: {
+        flexGrow: 1,
       }
   });
 
@@ -71,19 +76,30 @@ class Dashboard extends React.Component {
     updateSubscriptionDetails = (resp) => {
         if (resp.status == 200) {
             var formatted = [];
-            let subscriptions = resp.data.forEach(sub => {
-                let obj = {
-                    productName: sub.productName, 
-                    currency: sub.currency,
-                    unitAmount: sub.unitAmount,
-                    billingScheme: sub.billingScheme,
-                    interval: sub.interval,
-                    intervalCount: sub.intervalCount
-                }
-                formatted.push(obj);
-            })
-            this.setState({subscriptions: formatted});
+            if (resp.data == []) {
+                this.setState({subscriptions: []});
+            } else{
+                let subscriptions = resp.data.forEach(sub => {
+                    let obj = {
+                        productName: sub.productName, 
+                        currency: sub.currency,
+                        unitAmount: sub.unitAmount,
+                        billingScheme: sub.billingScheme,
+                        interval: sub.interval,
+                        intervalCount: sub.intervalCount
+                    }
+                    formatted.push(obj);
+                })
+                this.setState({subscriptions: formatted});
+            }
+            
         }
+    }
+
+    getCardDetails = (authToken, headers) => {
+        let endpoint = this.state.baseUrl + "payment_method/get_card_details/" + this.state.userDetails.userId + "/"
+        axios.get(endpoint, {headers: headers})
+        // .then WIP
     }
 
     getSubscriptions = (authToken, headers) => {
@@ -106,6 +122,7 @@ class Dashboard extends React.Component {
         )
         .then((resp) => {this.updateUserDetails(resp)})
         .then(() => {this.getSubscriptions(authToken, headers)})
+        .then(() => {this.getCardDetails(authToken, headers)})
         .catch((error) => console.log("ERROR -> ", error))
     }
 
@@ -114,16 +131,11 @@ class Dashboard extends React.Component {
         let subs = this.state.subscriptions;
         if (subs != []) {
             const cards = subs.map((sub) => 
-                <Col>
                 <OutlinedCard subscription={sub} />
-                </Col>
             )
             return (
-                <Container> 
-                    <Row xs={2} md={8}  >
-                        {cards}
-                    </Row> 
-                </Container>
+                <div>{cards}</div>
+                    
             )
         } else {
             return ("")
@@ -133,8 +145,23 @@ class Dashboard extends React.Component {
     render() {
         return (
             <div> 
-                {this.renderSubscriptions()}
-           </div>
+                <div className="split left">
+                    <div className="centeredLeft">
+                        <div> 
+                            <h3>Your Subscriptions</h3> 
+                            {this.renderSubscriptions()}
+                        </div>
+                    </div>
+                    </div>
+
+                    <div className="split right">
+                    <div className="centered">
+                       <div> 
+                           {this.renderCardSe}
+                       </div>
+                    </div>
+                </div>
+            </div>
         )
     }
 }
