@@ -60,7 +60,8 @@ class Dashboard extends React.Component {
               cardNumber: "",
               expiryMonth: 0,
               expiryYear: 0,
-              cvv: ""
+              cvv: "",
+              paymentMethodId: "",
           },
           hasCard: false,
           hasSubscriptions: false
@@ -192,6 +193,44 @@ class Dashboard extends React.Component {
         this.setState({card: card});
     }
 
+    updatePaymentMethod = () => {
+        let endpoint = this.state.baseUrl + "manager/update_payment_method/"
+        const headers = {
+            "Content-Type": "application/json",
+            "Authorization": "Token " + sessionStorage.getItem("authToken")
+        }
+        let requestBody = {
+            paymentMethodId: this.state.card.paymentMethodId,
+            managerId: this.state.userDetails.userId
+        }
+        axios.put(endpoint, requestBody, {headers: headers})
+        .then((resp) => console.log(resp))
+        .catch((error) => console.log("ERROR -> ", error))
+    }
+
+    setDefaultPaymentMethod = () => {
+        let endpoint = this.state.baseUrl + "manager/add_default_payment/"
+        const headers = {
+            "Content-Type": "application/json",
+            "Authorization": "Token " + sessionStorage.getItem("authToken")
+        }
+        let requestBody = {
+            paymentMethodId: this.state.card.paymentMethodId,
+            managerId: this.state.userDetails.userId
+        }
+
+        axios.post(endpoint, requestBody, {headers: headers})
+        .then((resp) => console.log(resp.data, "FFFFFFFFFFFFFFFFFFFFs"))
+        .catch((error) => console.log("ERROR -> ", error))
+        //WIP
+    }
+
+    setCardDetails = (resp) => {
+        let card = this.state.card;
+        card.paymentMethodId = resp.data.Details.id;
+        this.setState({card: card});
+    }
+
     handleSave = (event) => {
         event.preventDefault();
         let endpoint = this.state.baseUrl + "payment_method/create/"
@@ -200,7 +239,9 @@ class Dashboard extends React.Component {
             "Authorization": "Token " + sessionStorage.getItem("authToken")
         }
         axios.post(endpoint, this.state.card, {headers: headers})
-        .then((resp) => console.log(resp)) // Call Update payment method API and addDefaultpaymentmethod
+        .then((resp) => {this.setCardDetails(resp)}) // Call Update payment method API and addDefaultpaymentmethod
+        .then(() => {this.updatePaymentMethod()})
+        .then(() => {this.setDefaultPaymentMethod()})
         .catch((error) => console.log("ERROR -> ", error))
     }
 
