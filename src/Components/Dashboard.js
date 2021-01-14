@@ -13,7 +13,8 @@ import Container from 'react-bootstrap/Container'
 import Grid from '@material-ui/core/Grid';
 import '../App.css';
 import PaperCard from "./PaperCard";
-import { CompareArrowsOutlined } from "@material-ui/icons";
+import ReadOnlyCard from "./ReadOnlyCard";
+import FullScreenDialog from "./FullScreenDialog";
 
 const styles = theme => ({
     root: {
@@ -52,7 +53,8 @@ class Dashboard extends React.Component {
             emailId: "",
             address: "",
             dateOfBirth: "",
-            company: ""
+            company: "",
+            paymentMethodId: ""
           },
           subscriptions: [],
           card: {
@@ -64,7 +66,8 @@ class Dashboard extends React.Component {
               paymentMethodId: "",
           },
           hasCard: false,
-          hasSubscriptions: false
+          hasSubscriptions: false,
+          subsPromptState: false
         };
       }
 
@@ -78,7 +81,8 @@ class Dashboard extends React.Component {
                 emailId: returned.emailId, 
                 password:  returned.password, 
                 company: returned.company, 
-                dateOfBirth: returned.dateOfBirth
+                dateOfBirth: returned.dateOfBirth,
+                paymentMethodId: returned.paymentMethodId
             }
 
             this.setState({userDetails: userObject});
@@ -86,7 +90,7 @@ class Dashboard extends React.Component {
     }
     
     updateCardDetails = (resp) => {
-        if (resp.status == 200 && resp.data.cardNumber != "") {
+        if (resp.status == 200 && resp.data != false) {
             let returned = resp.data;
             let cardObject = {
                 type: returned.type,
@@ -153,19 +157,48 @@ class Dashboard extends React.Component {
         .catch((error) => console.log("ERROR -> ", error))
     }
 
+    toggleSubscriptionPrompt = (event) => {
+        event.preventDefault();
+        let currentState = this.state.subsPromptState;
+        this.setState({subsPromptState: ! currentState});
+    }
+
+    renderEmptySubsView = () => {
+        const classes = this.props;
+        return (
+            <div>
+                <Typography className={classes.title} color="textSecondary" gutterBottom>
+                    You dont have any subscriptions yet
+                </Typography>
+                < br /> 
+                <Button
+                    style={{ margin: 5, marginLeft: "20%", right: 20 }}
+                    variant="contained"
+                    onClick = {(event) => this.toggleSubscriptionPrompt(event)}
+                    color="primary"
+                    className={classes.button}
+                >
+                    View Subscriptions
+            </Button>
+                </div> 
+            )
+    }
+
     renderSubscriptions = () => {
         const styles = this.props;
         let subs = this.state.subscriptions;
-        if (subs != []) {
+        if (subs != false) {
             const cards = subs.map((sub) => 
                 <OutlinedCard subscription={sub} />
             )
             return (
-                <div>{cards}</div>
-                    
+                <div>
+                    <h3>Your Subscriptions</h3> 
+                    {cards}
+                </div> 
             )
         } else {
-            return ("")
+            return ( <div> {this.renderEmptySubsView()} </div> )
         }
     }
 
@@ -204,31 +237,33 @@ class Dashboard extends React.Component {
             managerId: this.state.userDetails.userId
         }
         axios.put(endpoint, requestBody, {headers: headers})
-        .then((resp) => console.log(resp))
+        .then((resp) => {this.setState({hasCard: true})})
         .catch((error) => console.log("ERROR -> ", error))
     }
 
-    setDefaultPaymentMethod = () => {
-        let endpoint = this.state.baseUrl + "manager/add_default_payment/"
-        const headers = {
-            "Content-Type": "application/json",
-            "Authorization": "Token " + sessionStorage.getItem("authToken")
-        }
-        let requestBody = {
-            paymentMethodId: this.state.card.paymentMethodId,
-            managerId: this.state.userDetails.userId
-        }
+    // setDefaultPaymentMethod = () => {
+        // let endpoint = this.state.baseUrl + "manager/add_default_payment/"
+        // const headers = {
+        //     "Content-Type": "application/json",
+        //     "Authorization": "Token " + sessionStorage.getItem("authToken")
+        // }
+        // let requestBody = {
+        //     paymentMethodId: this.state.card.paymentMethodId,
+        //     managerId: this.state.userDetails.userId
+        // }
 
-        axios.post(endpoint, requestBody, {headers: headers})
-        .then((resp) => console.log(resp.data, "FFFFFFFFFFFFFFFFFFFFs"))
-        .catch((error) => console.log("ERROR -> ", error))
+        // axios.post(endpoint, requestBody, {headers: headers})
+        // .then((resp) => console.log(resp.data, "FFFFFFFFFFFFFFFFFFFFs"))
+        // .catch((error) => console.log("ERROR -> ", error))
         //WIP
-    }
+    // }
 
     setCardDetails = (resp) => {
         let card = this.state.card;
+        let user = this.state.userDetails;
         card.paymentMethodId = resp.data.Details.id;
-        this.setState({card: card});
+        user.paymentMethodId = card.paymentMethodId;
+        this.setState({card: card, userDetails: user});
     }
 
     handleSave = (event) => {
@@ -241,9 +276,46 @@ class Dashboard extends React.Component {
         axios.post(endpoint, this.state.card, {headers: headers})
         .then((resp) => {this.setCardDetails(resp)}) // Call Update payment method API and addDefaultpaymentmethod
         .then(() => {this.updatePaymentMethod()})
-        .then(() => {this.setDefaultPaymentMethod()})
+        // .then(() => {this.setDefaultPaymentMethod()})
         .catch((error) => console.log("ERROR -> ", error))
     }
+
+    updateCardDetailsState = () => {
+        let card = {
+            cardNumber: "",
+            expiryMonth: 0,
+            expiryYear: 0,
+            cvv: ""
+        }
+
+        let user = this.state.userDetails; 
+        user.paymentMethodId = "";
+
+
+        {this.setState(
+            {
+                hasCard: false,
+                card: card,
+                usedDetails: user
+            }
+        )}
+    }
+
+    removeCardFromUser = (event) => {
+        event.preventDefault();
+        let endpoint = this.state.baseUrl + "manager/remove_card_details/";
+        const headers = {
+            "Content-Type": "application/json",
+            "Authorization": "Token " + sessionStorage.getItem("authToken")
+        }
+        let requestBody = {
+            paymentMethodId: this.state.userDetails.paymentMethodId,
+        }
+        axios.post(endpoint, requestBody, {headers: headers})
+        .then((resp) => {this.updateCardDetailsState()})
+        .catch((error) => console.log("ERROR -> ", error))
+    }
+    
 
     // Called if the user does not have any card saved
     renderAddCardForm = () => {
@@ -258,11 +330,23 @@ class Dashboard extends React.Component {
 
     renderCardSection = () => {
         let hasCard = this.state.hasCard;
-        hasCard = false; // REMOVE THIS LINE ONCE DONE
         if (! hasCard) {
             return <div> {this.renderAddCardForm()} </div>
         } else {
-            // # WIP
+            return <div>  <ReadOnlyCard cardDetails={this.state.card} onDelete={this.removeCardFromUser} /> </div>
+        }
+    }
+
+    closeDialog = (event) => {
+        event.preventDefault();
+        
+        this.setState({subsPromptState: false});
+    }
+
+    renderSubscriptionPrompt = () => {
+        console.log(this.state.subsPromptState, "SSSSSSSSSSSSSSSSSss")
+        if (this.state.subsPromptState) {
+            return <FullScreenDialog handleClose={this.closeDialog} open={true}/> 
         }
     }
 
@@ -272,7 +356,6 @@ class Dashboard extends React.Component {
                 <div className="split left">
                     <div className="centeredLeft">
                         <div> 
-                            <h3>Your Subscriptions</h3> 
                             {this.renderSubscriptions()}
                         </div>
                     </div>
@@ -282,6 +365,7 @@ class Dashboard extends React.Component {
                     <div className="centered">
                        <div> 
                            {this.renderCardSection()}
+                           {this.renderSubscriptionPrompt()}
                        </div>
                     </div>
                 </div>
