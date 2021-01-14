@@ -344,7 +344,6 @@ class Dashboard extends React.Component {
     }
 
     renderSubscriptionPrompt = () => {
-        console.log(this.state.subsPromptState, "SSSSSSSSSSSSSSSSSss")
         if (this.state.subsPromptState) {
             return <FullScreenDialog handleClose={this.closeDialog} open={true}/> 
         }
