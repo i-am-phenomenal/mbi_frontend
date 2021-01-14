@@ -42,12 +42,13 @@ class Dashboard extends React.Component {
             dateOfBirth: "",
             company: ""
           },
+          subscriptions: [],
         };
       }
 
     updateUserDetails = (response) => {
         if (response.status == 200) {
-            let returned = response.data
+            let returned = response.data;
             let userObject = {
                 userId: returned.id,
                 firstName: returned.firstName,
@@ -62,6 +63,31 @@ class Dashboard extends React.Component {
         }
     }
 
+    updateSubscriptionDetails = (resp) => {
+        if (resp.status == 200) {
+            var formatted = [];
+            let subscriptions = resp.data.forEach(sub => {
+                let obj = {
+                    productName: sub.productName, 
+                    currency: sub.currency,
+                    unitAmount: sub.unitAmount,
+                    billingScheme: sub.billingScheme,
+                    interval: sub.interval,
+                    intervalCount: sub.intervalCount
+                }
+                formatted.push(obj);
+            })
+            this.setState({formatted: subscriptions});
+        }
+    }
+
+    getSubscriptions = (authToken, headers) => {
+        let endpoint = this.state.baseUrl + "subscriptions/get_available/" + this.state.userDetails.userId + "/"
+        axios.get(endpoint,{headers: headers})
+        .then((resp) => {this.updateSubscriptionDetails(resp)})
+        .catch((error) => console.log("ERROR -> ", error))
+    }
+
     componentDidMount() {
         let authToken = sessionStorage.getItem("authToken");
         const headers = {
@@ -74,11 +100,11 @@ class Dashboard extends React.Component {
         }
         )
         .then((resp) => {this.updateUserDetails(resp)})
+        .then(() => {this.getSubscriptions(authToken, headers)})
         .catch((error) => console.log("ERROR -> ", error))
     }
 
     render() {
-        console.log(this.state.userDetails)
         return (
             <p> Dashboard </p>
         )
