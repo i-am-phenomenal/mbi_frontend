@@ -291,12 +291,13 @@ class App extends React.Component {
       this.setState({redirectPath: "/dashboard/", shouldRedirect: true})
     } else {
       this.setState({redirectPath: "/", shouldRedirect: false})
-    }
+    } 
   }
 
   validate = (response) => {
     if (response.status == 200)  {
       sessionStorage.setItem("authToken", response.data.authToken);
+      console.log(response.data, "1111111111")
       this.setState({shouldRedirect: true, redirectPath: "/dashboard/"})
     }
   }
@@ -414,9 +415,9 @@ class App extends React.Component {
       <Router> 
         <Switch>
           
-            <Route path="/dashboard/" component={Dashboard} /> 
-                {/* <Dashboard /> */}
-            {/* </Route> */}
+            <Route path="/dashboard/" >
+              <Dashboard userDetails={this.state.userDetails} />
+            </Route>
             <Route exact path = "/">
                 {this.state.shouldRedirect ? <Redirect to="/dashboard/" /> : this.renderHomePage()}
                 
