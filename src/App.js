@@ -16,6 +16,10 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import FormControl from '@material-ui/core/FormControl';
 import Input from '@material-ui/core/Input';
 import TextField from '@material-ui/core/TextField';
+import Icon from '@material-ui/core/Icon';
+import SaveIcon from '@material-ui/icons/Save';
+import Button from '@material-ui/core/Button';
+import axios from 'axios';
     
 const styles = theme => ({
   root: {
@@ -36,6 +40,16 @@ class App extends React.Component {
     super(props);
     this.state = {
       selectedTab: "signUp",
+      userDetails: {
+        firstName: "",
+        lastName: "",
+        password: "",
+        emailId: "",
+        address: "",
+        dateOfBirth: "",
+        company: ""
+      },
+      baseUrl: "http://localhost:8000/",
     };
   }
   
@@ -48,8 +62,71 @@ class App extends React.Component {
     );
   };
 
+  handleInputChange = (event, flag) => {
+    let user = this.state.userDetails;
+    let enteredVal = event.target.value;
+    switch(flag) {
+      case "firstName": {
+        user.firstName = enteredVal;
+        this.setState({userDetails: user});
+        break;
+      }
+
+      case "lastName": {
+        user.lastName = enteredVal;
+        this.setState({userDetails: user});
+        break;
+      }
+
+      case "password": {
+        user.password = enteredVal;
+        this.setState({userDetails: user});
+        break;
+      }
+
+      case "address": {
+        user.address = enteredVal;
+        this.setState({userDetails: user});
+        break;
+      }
+
+      case "emailId": { 
+        user.emailId = enteredVal; 
+        this.setState({userDetails: user});
+        break;
+      }
+
+      case "dateOfBirth": {
+        user.dateOfBirth = enteredVal;
+        this.setState({userDetails: user});
+        break;
+      }
+
+      case "company": {
+        user.company = enteredVal; 
+        this.setState({userDetails: user});
+        break;
+      }
+      
+      default: 
+        break;
+    }
+  }
+
+  signUpUser = (event) => {
+    event.preventDefault();
+    const headers = {
+      "Content-Type": "application/json"
+    }
+    let userDetails = this.state.userDetails; 
+    axios.post(this.state.baseUrl + "manager/signup/", userDetails, {headers: headers})
+    .then((response) => console.log(response, '11111111111111'))
+    .catch((error) => console.log("ERROR -> ", error))
+  }
+
   renderSignUpForm = () => {
     const classes = this.props;
+    let user = this.state.userDetails;
     return (
       <div
         style={{
@@ -65,7 +142,9 @@ class App extends React.Component {
           id="first_name"
           label="First Name"
           style={{ margin: 8 }}
+          onChange={(event)=> this.handleInputChange(event, "firstName")}
           placeholder="Enter your First Name"
+          value = {user.firstName}
           helperText=""
           fullWidth
           margin="normal"
@@ -78,7 +157,9 @@ class App extends React.Component {
           <TextField
             id="last_name"
             label="Last Name"
+            onChange={(event)=> this.handleInputChange(event, "lastName")}
             style={{ margin: 8 }}
+            value={user.lastName}
             placeholder="Enter your Last Name"
             helperText=""
             fullWidth
@@ -92,7 +173,9 @@ class App extends React.Component {
           <TextField
             id="email_id"
             label="Email Id"
+            onChange={(event)=> this.handleInputChange(event, "emailId")}
             style={{ margin: 8 }}
+            value = {user.emailId}
             placeholder="Enter your Email Id"
             helperText=""
             fullWidth
@@ -106,10 +189,13 @@ class App extends React.Component {
           <TextField
             id="password"
             label="Password"
+            onChange={(event)=> this.handleInputChange(event, "password")}
+            value={user.password}
             style={{ margin: 8 }}
             placeholder="Enter your Password"
             helperText=""
             fullWidth
+            type="password"
             margin="normal"
             InputLabelProps={{
               shrink: true,
@@ -119,6 +205,8 @@ class App extends React.Component {
           
           <TextField
             style = {{width: "100%"}}
+            onChange={(event)=> this.handleInputChange(event, "address")}
+            value = {user.address}
             id="address"
             label="Address"
             multiline
@@ -130,6 +218,8 @@ class App extends React.Component {
           <TextField
             id="date_of_birth"
             label="Date Of Birth"
+            onChange={(event)=> this.handleInputChange(event, "dateOfBirth")}
+            value={user.dateOfBirth}
             style={{ margin: 8 }}
             placeholder="Enter your Date of birth (DD/MM/YYYY)"
             helperText=""
@@ -143,6 +233,8 @@ class App extends React.Component {
 
           <TextField
             id="company"
+            value={user.company}
+            onChange={(event)=> this.handleInputChange(event, "company")}
             label="Company"
             style={{ margin: 8 }}
             placeholder="Enter your Company"
@@ -154,6 +246,16 @@ class App extends React.Component {
             }}
             variant="outlined"
           />
+
+            <Button
+            style={{ margin: 8, marginLeft: "40%" }}
+            variant="contained"
+            onClick = {(event) => this.signUpUser(event)}
+            color="primary"
+            className={classes.button}
+          >
+            Sign Up
+      </Button>
         </div>
     )
   }
