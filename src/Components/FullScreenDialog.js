@@ -72,7 +72,7 @@ class FullScreenDialog extends React.Component {
 
   handleOnPurchaseClick = (event, priceId) => {
     if (this.props.metadata.paymentMethodId == null) {
-      alert("You need to enter payment method details first");
+      alert("You need to add payment method details first");
     } else {
       {this.subscribeToProduct(priceId)}
     }

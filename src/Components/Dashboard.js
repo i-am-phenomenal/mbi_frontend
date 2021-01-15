@@ -109,6 +109,7 @@ class Dashboard extends React.Component {
             if (resp.data == []) {
                 this.setState({subscriptions: []});
             } else{
+                // console.log(resp.data, "DDDDDDDDDDDDDDDDDDD")
                 let subscriptions = resp.data.forEach(sub => {
                     let obj = {
                         productName: sub.productName, 
@@ -116,7 +117,8 @@ class Dashboard extends React.Component {
                         unitAmount: sub.unitAmount,
                         billingScheme: sub.billingScheme,
                         interval: sub.interval,
-                        intervalCount: sub.intervalCount
+                        intervalCount: sub.intervalCount,
+                        subscriptionId: sub.subscriptionId
                     }
                     formatted.push(obj);
                 })
@@ -184,12 +186,39 @@ class Dashboard extends React.Component {
             )
     }
 
+    removeSubscriptionFromState = (subId) => {
+        let updated = []
+        this.state.subscriptions.forEach((sub) => {
+            if (sub.subscriptionId != subId) {
+                updated.push(sub);
+            }
+        })
+        this.setState({subscriptions: updated});
+    }
+
+    unsubscribeFromPlan = (event, subId) => {
+        event.preventDefault();
+        let endpoint = this.state.baseUrl + "subscriptions/delete/"
+        let requestBody = {
+            subscriptionId: subId
+        }
+        const headers = {
+            "Content-Type": "application/json",
+            "Authorization": "Token " + sessionStorage.getItem("authToken")
+        }
+        axios.post(endpoint, requestBody, {headers: headers})
+        .then((resp) => {this.removeSubscriptionFromState(subId)})
+        .catch((error) => console.log("ERROR -> ", error))
+
+    }
+
     renderSubscriptions = () => {
         const styles = this.props;
         let subs = this.state.subscriptions;
         if (subs != false) {
             const cards = subs.map((sub) => 
-                <OutlinedCard subscription={sub} />
+            
+                <OutlinedCard subscription={sub} onDelete={this.unsubscribeFromPlan}/>
             )
             return (
                 <div>

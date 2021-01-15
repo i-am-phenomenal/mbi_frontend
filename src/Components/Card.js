@@ -15,6 +15,7 @@ import FavoriteIcon from '@material-ui/icons/Favorite';
 import ShareIcon from '@material-ui/icons/Share';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import DeleteSweepIcon from '@material-ui/icons/DeleteSweep';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -44,6 +45,7 @@ export default function OutlineCard(props) {
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
   let subscription = props.subscription;
+  console.log(subscription, "DDDDDDDDD")
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
@@ -63,12 +65,12 @@ export default function OutlineCard(props) {
       <CardContent>
       </CardContent>
       <CardActions disableSpacing>
-        <IconButton aria-label="add to favorites" >
-          <FavoriteIcon />
+        <IconButton aria-label="add to favorites" onClick={(event) => props.onDelete(event, subscription.subscriptionId)}>
+          <DeleteSweepIcon />
         </IconButton>
-        <IconButton aria-label="share">
+        {/* <IconButton aria-label="share">
           <ShareIcon />
-        </IconButton>
+        </IconButton> */}
         <IconButton
           className={clsx(classes.expand, {
             [classes.expandOpen]: expanded,
