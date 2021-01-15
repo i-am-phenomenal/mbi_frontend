@@ -15,6 +15,7 @@ import '../App.css';
 import PaperCard from "./PaperCard";
 import ReadOnlyCard from "./ReadOnlyCard";
 import FullScreenDialog from "./FullScreenDialog";
+import { AccordionSummary } from "@material-ui/core";
 
 const styles = theme => ({
     root: {
@@ -109,7 +110,6 @@ class Dashboard extends React.Component {
             if (resp.data == []) {
                 this.setState({subscriptions: []});
             } else{
-                // console.log(resp.data, "DDDDDDDDDDDDDDDDDDD")
                 let subscriptions = resp.data.forEach(sub => {
                     let obj = {
                         productName: sub.productName, 
@@ -209,7 +209,23 @@ class Dashboard extends React.Component {
         axios.post(endpoint, requestBody, {headers: headers})
         .then((resp) => {this.removeSubscriptionFromState(subId)})
         .catch((error) => console.log("ERROR -> ", error))
+    }
 
+    initiatePayment = (event, subId) => {
+        event.preventDefault();
+        let endpoint = this.state.baseUrl + "payment_method/payment_intent/"
+        let requestBody = {
+            customerId: this.state.userDetails.userId, 
+            paymentMethodId: this.state.userDetails.paymentMethodId,
+            subscriptionId: subId
+        }
+        const headers = {
+            "Content-Type": "application/json",
+            "Authorization": "Token " + sessionStorage.getItem("authToken")
+        }
+        axios.post(endpoint, requestBody, {headers: headers})
+        .then((resp) => console.log(resp))
+        .catch((error) => console.log("ERROR -> ", error))
     }
 
     renderSubscriptions = () => {
@@ -217,8 +233,7 @@ class Dashboard extends React.Component {
         let subs = this.state.subscriptions;
         if (subs != false) {
             const cards = subs.map((sub) => 
-            
-                <OutlinedCard subscription={sub} onDelete={this.unsubscribeFromPlan}/>
+                <OutlinedCard subscription={sub} onDelete={this.unsubscribeFromPlan} onPaySelect={this.initiatePayment}  />
             )
             return (
                 <div>
@@ -270,23 +285,6 @@ class Dashboard extends React.Component {
         .catch((error) => console.log("ERROR -> ", error))
     }
 
-    // setDefaultPaymentMethod = () => {
-        // let endpoint = this.state.baseUrl + "manager/add_default_payment/"
-        // const headers = {
-        //     "Content-Type": "application/json",
-        //     "Authorization": "Token " + sessionStorage.getItem("authToken")
-        // }
-        // let requestBody = {
-        //     paymentMethodId: this.state.card.paymentMethodId,
-        //     managerId: this.state.userDetails.userId
-        // }
-
-        // axios.post(endpoint, requestBody, {headers: headers})
-        // .then((resp) => console.log(resp.data, "FFFFFFFFFFFFFFFFFFFFs"))
-        // .catch((error) => console.log("ERROR -> ", error))
-        //WIP
-    // }
-
     setCardDetails = (resp) => {
         let card = this.state.card;
         let user = this.state.userDetails;
@@ -305,7 +303,6 @@ class Dashboard extends React.Component {
         axios.post(endpoint, this.state.card, {headers: headers})
         .then((resp) => {this.setCardDetails(resp)}) // Call Update payment method API and addDefaultpaymentmethod
         .then(() => {this.updatePaymentMethod()})
-        // .then(() => {this.setDefaultPaymentMethod()})
         .catch((error) => console.log("ERROR -> ", error))
     }
 

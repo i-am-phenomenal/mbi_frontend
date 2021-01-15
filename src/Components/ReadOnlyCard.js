@@ -5,10 +5,11 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 const useStyles = makeStyles({
   root: {
-    minWidth: 275,
+    minWidth: 350,
   },
   bullet: {
     display: 'inline-block',
@@ -46,7 +47,14 @@ export default function ReadOnlyCard(props) {
         </Typography>
       </CardContent>
       <CardActions>
-        <Button size="small" onClick={props.onDelete}>Remove Card</Button>
+          <Button
+            variant="contained"
+            color="secondary"
+            startIcon={<DeleteIcon />}
+            onClick={props.onDelete}
+          >
+            Remove
+          </Button>
       </CardActions>
     </Card>
   );

@@ -53,6 +53,13 @@ class FullScreenDialog extends React.Component {
     .then((resp) => {this.setProducts(resp)})
     .catch((error) => console.log("ERROR ==> ", error))
   }
+
+  setupPaymentIntent = (requestBody, headers) => {
+    let endpoint = "http://localhost:8000/payment_method/setup_intent/"
+    axios.post(endpoint, requestBody, {headers: headers})
+    .then((resp) => console.log(resp))
+    .catch((error) => console.log("ERROR -> ", error))
+  }
   
   subscribeToProduct = (priceId) => {
     let metadata = this.props.metadata;
@@ -67,6 +74,7 @@ class FullScreenDialog extends React.Component {
       "Authorization": "Token " + sessionStorage.getItem("authToken")
   }
     axios.post(endpoint, requestBody, {headers: headers})
+    .then(() => {this.setupPaymentIntent(requestBody, headers)})
     .catch((error) => console.log("ERROR ==> ", error))
   }
 
