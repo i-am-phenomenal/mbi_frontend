@@ -47,7 +47,7 @@ export default function PlanItem(props) {
                 color="primary"
                 className={classes.button}
               >
-                  Purchase
+                  Subscribe
             </Button>
             </React.Fragment>
           }

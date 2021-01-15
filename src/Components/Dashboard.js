@@ -237,6 +237,15 @@ class Dashboard extends React.Component {
             )
             return (
                 <div>
+                    <Button
+                    style={{ margin: 5, marginLeft: "20%", right: 20 }}
+                    variant="contained"
+                    onClick = {(event) => this.toggleSubscriptionPrompt(event)}
+                    color="primary"
+                    className={styles.button}
+                    >
+                        View Subscriptions
+                </Button>
                     <h3>Your Subscriptions</h3> 
                     {cards}
                 </div> 
@@ -367,6 +376,7 @@ class Dashboard extends React.Component {
         event.preventDefault();
         
         this.setState({subsPromptState: false});
+        alert("Please refresh the screen to see subscriptions.")
     }
 
     renderSubscriptionPrompt = () => {

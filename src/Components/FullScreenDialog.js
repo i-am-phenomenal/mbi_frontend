@@ -57,7 +57,7 @@ class FullScreenDialog extends React.Component {
   setupPaymentIntent = (requestBody, headers) => {
     let endpoint = "http://localhost:8000/payment_method/setup_intent/"
     axios.post(endpoint, requestBody, {headers: headers})
-    .then((resp) => console.log(resp))
+    .then((resp) => alert("You have successfully subscribed to this plan"))
     .catch((error) => console.log("ERROR -> ", error))
   }
   
