@@ -304,7 +304,7 @@ class Dashboard extends React.Component {
 
     handleSave = (event) => {
         event.preventDefault();
-        let endpoint = this.state.baseUrl + "payment_method/create/"
+        let endpoint = this.state.baseUrl + "payment_method/"
         const headers = {
             "Content-Type": "application/json",
             "Authorization": "Token " + sessionStorage.getItem("authToken")
@@ -322,11 +322,8 @@ class Dashboard extends React.Component {
             expiryYear: 0,
             cvv: ""
         }
-
         let user = this.state.userDetails; 
         user.paymentMethodId = "";
-
-
         {this.setState(
             {
                 hasCard: false,
