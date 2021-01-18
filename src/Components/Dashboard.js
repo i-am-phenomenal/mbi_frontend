@@ -89,7 +89,7 @@ class Dashboard extends React.Component {
             this.setState({userDetails: userObject});
         }
     }
-    
+
     updateCardDetails = (resp) => {
         if (resp.status == 200 && resp.data != false) {
             let returned = resp.data.cardDetails;
@@ -112,19 +112,18 @@ class Dashboard extends React.Component {
             } else{
                 let subscriptions = resp.data.forEach(sub => {
                     let obj = {
-                        productName: sub.productName, 
-                        currency: sub.currency,
-                        unitAmount: sub.unitAmount,
-                        billingScheme: sub.billingScheme,
-                        interval: sub.interval,
-                        intervalCount: sub.intervalCount,
-                        subscriptionId: sub.subscriptionId
+                        productName: sub.price.product.productName, 
+                        currency: sub.price.currency,
+                        unitAmount: sub.price.unitAmount,
+                        billingScheme: sub.price.billingScheme,
+                        interval: sub.price.interval,
+                        intervalCount: sub.price.intervalCount,
+                        subscriptionId: sub.price.subscriptionId
                     }
                     formatted.push(obj);
                 })
                 this.setState({subscriptions: formatted, hasSubscriptions: true});
             }
-            
         }
     }
 
@@ -136,7 +135,7 @@ class Dashboard extends React.Component {
     }
 
     getSubscriptions = (authToken, headers) => {
-        let endpoint = this.state.baseUrl + "subscriptions/get_available/" + this.state.userDetails.userId + "/"
+        let endpoint = this.state.baseUrl + "subscriptions/get_all/" //+ this.state.userDetails.userId + "/"
         axios.get(endpoint,{headers: headers})
         .then((resp) => {this.updateSubscriptionDetails(resp)})
         .catch((error) => console.log("ERROR -> ", error))
