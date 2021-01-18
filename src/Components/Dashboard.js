@@ -91,9 +91,8 @@ class Dashboard extends React.Component {
     }
     
     updateCardDetails = (resp) => {
-        console.log(resp.data, "SSSSSSSSSSSSSSSSSSSS");
         if (resp.status == 200 && resp.data != false) {
-            let returned = resp.data;
+            let returned = resp.data.cardDetails;
             let cardObject = {
                 type: returned.type,
                 cardNumber: returned.cardNumber, 
@@ -133,7 +132,7 @@ class Dashboard extends React.Component {
         let endpoint = this.state.baseUrl + "manager/get_payment_method/" + this.state.userDetails.userId + "/"
         axios.get(endpoint, {headers: headers})
         .then((resp) => {this.updateCardDetails(resp)})
-        .catch((error) => console.log("ERROR -> ", error))
+        .catch((error) => alert(error))
     }
 
     getSubscriptions = (authToken, headers) => {
