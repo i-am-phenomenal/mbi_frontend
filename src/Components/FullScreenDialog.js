@@ -55,19 +55,19 @@ class FullScreenDialog extends React.Component {
     }
     axios.get(endpoint, {headers: headers})
     .then((resp) => {this.setProducts(resp)})
-    .catch((error) => console.log("ERROR ==> ", error))
+    .catch((error) => alert(error))
   }
 
   setupPaymentIntent = (requestBody, headers) => {
-    let endpoint = "http://localhost:8000/payment_method/setup_intent/"
+    let endpoint = "http://localhost:8000/setup_intent/"
     axios.post(endpoint, requestBody, {headers: headers})
     .then((resp) => alert("You have successfully subscribed to this plan"))
-    .catch((error) => console.log("ERROR -> ", error))
+    .catch((error) => alert(error))
   }
   
   subscribeToProduct = (priceId) => {
     let metadata = this.props.metadata;
-    let endpoint = "http://localhost:8000/subscriptions/create/"
+    let endpoint = "http://localhost:8000/subscriptions/"
     let requestBody = {
       paymentMethodId: metadata.paymentMethodId,
       customerId: metadata.customerId,
@@ -79,7 +79,7 @@ class FullScreenDialog extends React.Component {
     }
     axios.post(endpoint, requestBody, {headers: headers})
     .then(() => {this.setupPaymentIntent(requestBody, headers)})
-    .catch((error) => console.log("ERROR ==> ", error))
+    .catch((error) => alert(error))
   }
 
   handleOnPurchaseClick = (event, priceId) => {
