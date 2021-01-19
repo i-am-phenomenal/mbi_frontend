@@ -138,7 +138,7 @@ class Dashboard extends React.Component {
         let endpoint = this.state.baseUrl + "subscriptions/get_all/" + this.state.userDetails.userId + "/"
         axios.get(endpoint,{headers: headers})
         .then((resp) => {this.updateSubscriptionDetails(resp)})
-        .catch((error) => console.log("ERROR -> ", error))
+        .catch((error) => alert(error))
     }
 
     componentDidMount() {
@@ -147,7 +147,7 @@ class Dashboard extends React.Component {
             accept: 'application/json',
             "Authorization": "Token " + authToken
         }
-        axios.get(this.state.baseUrl + "manager/get_details/",
+        axios.get(this.state.baseUrl + "get_manager_details/",
         {
             headers: headers 
         }
@@ -155,7 +155,7 @@ class Dashboard extends React.Component {
         .then((resp) => {this.updateUserDetails(resp)})
         .then(() => {this.getSubscriptions(authToken, headers)})
         .then(() => {this.getCardDetails(authToken, headers)})
-        .catch((error) => console.log("ERROR -> ", error))
+        .catch((error) => alert(error))
     }
 
     toggleSubscriptionPrompt = (event) => {
@@ -212,7 +212,7 @@ class Dashboard extends React.Component {
 
     initiatePayment = (event, subId) => {
         event.preventDefault();
-        let endpoint = this.state.baseUrl + "payment_method/payment_intent/"
+        let endpoint = this.state.baseUrl + "payment_intent/"
         let requestBody = {
             customerId: this.state.userDetails.userId, 
             paymentMethodId: this.state.userDetails.paymentMethodId,
@@ -223,7 +223,7 @@ class Dashboard extends React.Component {
             "Authorization": "Token " + sessionStorage.getItem("authToken")
         }
         axios.post(endpoint, requestBody, {headers: headers})
-        .then((resp) => console.log(resp))
+        .then((resp) => alert("You have paid for this subscription plan"))
         .catch((error) => alert(error))
     }
 
@@ -290,7 +290,7 @@ class Dashboard extends React.Component {
         }
         axios.put(endpoint, requestBody, {headers: headers})
         .then((resp) => {this.setState({hasCard: true})})
-        .catch((error) => console.log("ERROR -> ", error))
+        .catch((error) => alert(error))
     }
 
     setCardDetails = (resp) => {
@@ -311,7 +311,7 @@ class Dashboard extends React.Component {
         axios.post(endpoint, this.state.card, {headers: headers})
         .then((resp) => {this.setCardDetails(resp)}) // Call Update payment method API and addDefaultpaymentmethod
         .then(() => {this.updatePaymentMethod()})
-        .catch((error) => console.log("ERROR -> ", error))
+        .catch((error) => alert(error))
     }
 
     updateCardDetailsState = () => {
@@ -344,7 +344,7 @@ class Dashboard extends React.Component {
         }
         axios.post(endpoint, requestBody, {headers: headers})
         .then((resp) => {this.updateCardDetailsState()})
-        .catch((error) => console.log("ERROR -> ", error))
+        .catch((error) => alert(error))
     }
     
 

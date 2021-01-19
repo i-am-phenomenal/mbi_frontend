@@ -146,7 +146,7 @@ class App extends React.Component {
     let userDetails = this.state.userDetails; 
     axios.post(this.state.baseUrl + "manager/signup/", userDetails, {headers: headers})
     .then((response) => {this.resetUserState()})
-    .catch((error) => console.log("ERROR -> ", error))
+    .catch((error) => alert(error))
   }
 
   renderSignUpForm = () => {
@@ -310,9 +310,9 @@ class App extends React.Component {
       "emailId": this.state.userDetails.emailId,
       "password": this.state.userDetails.password
     }
-    axios.post(this.state.baseUrl + "manager/login/", requestBody, {headers: headers})
+    axios.post(this.state.baseUrl + "manager_login/", requestBody, {headers: headers})
     .then((response) => {this.validate(response)})
-    .catch((error) => console.log("ERROR = ", error))
+    .catch((error) => alert(error))
   }
 
   renderLoginForm = () => {
