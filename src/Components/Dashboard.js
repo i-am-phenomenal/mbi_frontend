@@ -90,7 +90,7 @@ class Dashboard extends React.Component {
     }
 
     updateCardDetails = (resp) => {
-        if (resp.status == 200 && resp.data != false) {
+        if (resp.status == 200 && (resp.data.cardDetails != null )) {
             let returned = resp.data.cardDetails;
             let cardObject = {
                 type: returned.type,
@@ -104,7 +104,7 @@ class Dashboard extends React.Component {
     }
 
     updateSubscriptionDetails = (resp) => {
-        if (resp.status == 200) {
+        if (resp.status == 200 && resp.data.length != 0) {
             var formatted = [];
             if (resp.data == []) {
                 this.setState({subscriptions: []});

@@ -136,6 +136,7 @@ class App extends React.Component {
     }
 
     this.setState({userDetails: updatedUser});
+    alert("Manager signed up !")
   }
 
   signUpUser = (event) => {
