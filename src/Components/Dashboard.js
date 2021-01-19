@@ -85,7 +85,6 @@ class Dashboard extends React.Component {
                 dateOfBirth: returned.dateOfBirth,
                 paymentMethodId: returned.paymentMethodId
             }
-
             this.setState({userDetails: userObject});
         }
     }
@@ -334,15 +333,13 @@ class Dashboard extends React.Component {
 
     removeCardFromUser = (event) => {
         event.preventDefault();
-        let endpoint = this.state.baseUrl + "manager/remove_card_details/";
+        let paymentMethodId = this.state.userDetails.paymentMethodId;
+        let endpoint = this.state.baseUrl + "manager/remove_card_details/" + paymentMethodId + "/";
         const headers = {
             "Content-Type": "application/json",
             "Authorization": "Token " + sessionStorage.getItem("authToken")
         }
-        let requestBody = {
-            paymentMethodId: this.state.userDetails.paymentMethodId,
-        }
-        axios.post(endpoint, requestBody, {headers: headers})
+        axios.delete(endpoint, {headers: headers})
         .then((resp) => {this.updateCardDetailsState()})
         .catch((error) => alert(error))
     }
