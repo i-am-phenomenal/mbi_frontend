@@ -48,8 +48,12 @@ class FullScreenDialog extends React.Component {
   }
 
   componentDidMount() {
-    let endpoint = "http://localhost:8000/price/get_all/"
-    axios.get(endpoint)
+    let endpoint = "http://localhost:8000/price/"
+    const headers = {
+      "Content-Type": "application/json",
+      "Authorization": "Token " + sessionStorage.getItem("authToken")
+    }
+    axios.get(endpoint, {headers: headers})
     .then((resp) => {this.setProducts(resp)})
     .catch((error) => console.log("ERROR ==> ", error))
   }
@@ -72,7 +76,7 @@ class FullScreenDialog extends React.Component {
     const headers = {
       "Content-Type": "application/json",
       "Authorization": "Token " + sessionStorage.getItem("authToken")
-  }
+    }
     axios.post(endpoint, requestBody, {headers: headers})
     .then(() => {this.setupPaymentIntent(requestBody, headers)})
     .catch((error) => console.log("ERROR ==> ", error))

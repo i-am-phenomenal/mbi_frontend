@@ -118,7 +118,7 @@ class Dashboard extends React.Component {
                         billingScheme: sub.price.billingScheme,
                         interval: sub.price.interval,
                         intervalCount: sub.price.intervalCount,
-                        subscriptionId: sub.price.subscriptionId
+                        subscriptionId: sub.id
                     }
                     formatted.push(obj);
                 })
@@ -135,7 +135,7 @@ class Dashboard extends React.Component {
     }
 
     getSubscriptions = (authToken, headers) => {
-        let endpoint = this.state.baseUrl + "subscriptions/get_all/" //+ this.state.userDetails.userId + "/"
+        let endpoint = this.state.baseUrl + "subscriptions/get_all/" + this.state.userDetails.userId + "/"
         axios.get(endpoint,{headers: headers})
         .then((resp) => {this.updateSubscriptionDetails(resp)})
         .catch((error) => console.log("ERROR -> ", error))
@@ -197,7 +197,7 @@ class Dashboard extends React.Component {
 
     unsubscribeFromPlan = (event, subId) => {
         event.preventDefault();
-        let endpoint = this.state.baseUrl + "subscriptions/delete/"
+        let endpoint = this.state.baseUrl + "subscriptions/delete/" + subId + "/"
         let requestBody = {
             subscriptionId: subId
         }
@@ -205,9 +205,9 @@ class Dashboard extends React.Component {
             "Content-Type": "application/json",
             "Authorization": "Token " + sessionStorage.getItem("authToken")
         }
-        axios.post(endpoint, requestBody, {headers: headers})
+        axios.delete(endpoint, {headers: headers})
         .then((resp) => {this.removeSubscriptionFromState(subId)})
-        .catch((error) => console.log("ERROR -> ", error))
+        .catch((error) => alert(error))
     }
 
     initiatePayment = (event, subId) => {
@@ -224,7 +224,7 @@ class Dashboard extends React.Component {
         }
         axios.post(endpoint, requestBody, {headers: headers})
         .then((resp) => console.log(resp))
-        .catch((error) => console.log("ERROR -> ", error))
+        .catch((error) => alert(error))
     }
 
     renderSubscriptions = () => {
